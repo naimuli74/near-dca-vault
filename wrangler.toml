@@ -1,0 +1,17 @@
+name = "near-dca-vault"
+main = "src/worker.js"
+compatibility_date = "2025-09-01"
+account_id = "924b192f1ecca16e26617be53011939d"
+
+# Bindings are also set at deploy time via the Cloudflare API.
+# The KV namespace id is filled in after creation (scripts/build.mjs / deploy).
+[[kv_namespaces]]
+binding = "PLANS"
+id = "6dc2c69028764710a20fb03bdf90e7c7"
+preview_id = "6dc2c69028764710a20fb03bdf90e7c7"
+
+[triggers]
+crons = ["*/5 * * * *"]
+
+[vars]
+SITE_URL = "https://dca.darkhouse.online"

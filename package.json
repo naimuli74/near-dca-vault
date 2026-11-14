@@ -1,0 +1,11 @@
+{
+  "name": "near-dca-vault",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Non-custodial cross-chain DCA on NEAR Intents 1Click. Built at NEAR HACKATHON.",
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "dry-quote": "bash scripts/dry_quote.sh"
+  }
+}

@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>DCA Vault · NEAR Intents</title>
+<meta name="description" content="Non-custodial cross-chain DCA: deposit USDC from any chain NEAR Intents supports, buy BTC, ETH or NEAR on a schedule. Dry-run uses real 1Click quotes with no funds. Built at NEAR HACKATHON.">
+<link rel="canonical" href="https://dca.darkhouse.online/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="DCA Vault">
+<meta property="og:url" content="https://dca.darkhouse.online/">
+<meta property="og:title" content="Cross-chain DCA, without a custodian">
+<meta property="og:description" content="A NEAR HACKATHON Unstoppable DeFi entry. Real 1Click quotes, dry-run by default, live buys you fund yourself.">
+<meta property="og:image" content="https://dca.darkhouse.online/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:creator" content="@naimulislam">
+<meta name="twitter:title" content="Cross-chain DCA, without a custodian">
+<meta name="twitter:description" content="A NEAR HACKATHON Unstoppable DeFi entry. Real 1Click quotes, dry-run by default.">
+<meta name="twitter:image" content="https://dca.darkhouse.online/og.png">
+<meta name="theme-color" content="#f3f0e8" id="themecolor">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preload" href="/fonts/inter-var.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/instrument-serif-italic.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/styles.css">
+<script>
+document.documentElement.classList.add("js");
+(function(){var d=document.documentElement,t=null;try{t=localStorage.getItem("theme")}catch(e){}
+if(t!=="light"&&t!=="dark")t=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";
+d.dataset.theme=t;var m=document.querySelector("#themecolor");if(m)m.content=t==="dark"?"#0b0e0d":"#f3f0e8"})();
+</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="/#">
+      <svg class="mark" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#00ec97"/><path d="M8 23V10l10 12V9M16 13l4-4 4 4" stroke="#05140d" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+      <span class="name"><b>DCA Vault</b><span>NEAR Intents</span></span>
+    </a>
+    <div class="hdr-r">
+      <button class="themetog" type="button" id="themetog" aria-label="Toggle dark mode">
+        <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 14.5A8.5 8.5 0 1 1 9.5 3 7 7 0 0 0 21 14.5z" stroke-linejoin="round"/></svg>
+        <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="4"/><path stroke-linecap="round" d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M5.6 18.4 7 17M17 7l1.4-1.4"/></svg>
+      </button>
+      <a class="btn" href="https://github.com/naimuli74/near-dca-vault" rel="noopener">GitHub</a>
+    </div>
+  </div>
+</header>
+
+<div id="home-view">
+<section class="hero">
+  <div class="mesh" aria-hidden="true"><i></i><i></i></div>
+  <div class="wrap">
+    <div class="eyebrow"><i></i>NEAR HACKATHON · Unstoppable DeFi</div>
+    <h1>Cross-chain DCA, <span class="g">without a custodian.</span></h1>
+    <p class="lede">Deposit USDC from any chain NEAR Intents supports, pick BTC, ETH or NEAR, and a schedule. Each buy is a real 1Click quote. Dry-run is the default: judges can try it with no funds. Live mode is opt-in, and you send each interval yourself to a fresh deposit address.</p>
+    <div class="hero-cta">
+      <a class="btn pri" href="#create">Start a dry-run <span class="arr" aria-hidden="true">→</span></a>
+      <a class="btn" href="#how">How it works</a>
+    </div>
+    <ul class="hero-facts">
+      <li>Real 1Click quotes</li>
+      <li>Dry-run by default</li>
+      <li>No custody, no keys</li>
+    </ul>
+  </div>
+</section>
+
+<main id="main">
+  <div class="wrap">
+    <div class="steps" id="how">
+      <div class="step"><div class="sn">1</div><h3>Create a plan</h3><p>Choose USDC on a supported chain, a target asset, a destination address, a size, a slippage limit and a schedule.</p></div>
+      <div class="step"><div class="sn">2</div><h3>Get a real quote</h3><p>Each interval asks 1Click for a quote. Dry-run stops there. If the price is worse than your limit after fees, the buy is skipped.</p></div>
+      <div class="step"><div class="sn">3</div><h3>You send, if you want</h3><p>In live mode you fund that interval's deposit address yourself. The asset lands in your own address. We never hold the funds.</p></div>
+    </div>
+
+    <div class="grid" id="create" style="margin-top:28px">
+      <div class="card">
+        <h2>New plan</h2>
+        <form class="form" id="plan-form">
+          <div class="full">
+            <div class="modepill" role="group" aria-label="Plan mode">
+              <button type="button" class="on" data-mode="dry" id="mode-dry">Dry-run</button>
+              <button type="button" data-mode="live" id="mode-live">Live</button>
+            </div>
+            <div class="hint" id="mode-hint">Dry-run fetches real quotes and writes them to history. Nothing is deposited.</div>
+          </div>
+          <label>USDC from
+            <select id="origin" required></select>
+          </label>
+          <label>Buy
+            <select id="target" required>
+              <option value="BTC">Bitcoin (BTC)</option>
+              <option value="ETH">Ether (ETH)</option>
+              <option value="NEAR">NEAR (wNEAR)</option>
+            </select>
+          </label>
+          <label>Amount per buy (USDC)
+            <input id="amount" inputmode="decimal" value="50" required>
+          </label>
+          <label>Interval
+            <select id="interval">
+              <option value="5m">Every 5 minutes (good for a demo)</option>
+              <option value="15m">Every 15 minutes</option>
+              <option value="1h">Hourly</option>
+              <option value="1d" selected>Daily</option>
+              <option value="1w">Weekly</option>
+            </select>
+          </label>
+          <label class="full">Destination address
+            <input id="recipient" spellcheck="false" autocomplete="off" placeholder="bc1…, 0x… or name.near" required>
+            <span class="hint" id="recipient-hint">A Bitcoin address, because the target is BTC.</span>
+          </label>
+          <label class="full">Refund address (on the USDC chain)
+            <input id="refund" spellcheck="false" autocomplete="off" placeholder="Your address on the origin chain" required>
+          </label>
+          <label>Slippage limit (bps)
+            <input id="slippage" type="number" min="10" max="1000" value="100">
+            <span class="hint">100 = 1%. Quotes worse than this, after known fees, are skipped.</span>
+          </label>
+          <label>Max buys
+            <input id="maxbuys" type="number" min="1" max="365" value="12">
+          </label>
+          <div class="full live-box" id="live-box">
+            <div class="warn">Live mode is mainnet. The app will request a real 1Click deposit address. You send the funds yourself. There is no Intents testnet. Use a small amount, and only an address you control.</div>
+            <label style="margin-top:10px;flex-direction:row;align-items:flex-start;gap:10px;text-transform:none;letter-spacing:0;font-weight:500;color:var(--soft)">
+              <input type="checkbox" id="live-ack" style="width:auto;margin-top:3px">
+              I understand this is mainnet, I will send funds myself, and this app never holds them.
+            </label>
+          </div>
+          <div class="full row-actions">
+            <button class="btn" type="button" id="preview">Preview quote</button>
+            <button class="btn pri" type="submit">Create plan <span class="arr">→</span></button>
+          </div>
+          <div class="full err" id="form-err"></div>
+        </form>
+      </div>
+      <div>
+        <div class="card" id="preview-card">
+          <h2>Quote preview</h2>
+          <p class="muted" id="preview-empty">Press Preview quote for a live dry quote from the 1Click API. No deposit address is created.</p>
+          <div id="preview-body" hidden></div>
+        </div>
+        <div class="callout">
+          1Click deposit addresses are unique and expire in about 10 minutes, so this app does not hold a standing vault. A future version could let a NEAR contract own the funds and use Chain Signatures to pay each interval. <a href="https://github.com/naimuli74/near-dca-vault#limits-and-future-work">Read the limits.</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+</div>
+
+<div id="plan-view">
+  <main>
+    <div class="wrap" style="padding-top:28px">
+      <div class="plan-head">
+        <div>
+          <a href="/#" class="muted">← New plan</a>
+          <h1 style="font-size:clamp(28px,4vw,44px);margin:8px 0 8px" id="plan-title">Plan</h1>
+          <div style="display:flex;gap:8px;flex-wrap:wrap" id="plan-badges"></div>
+        </div>
+        <div class="row-actions" id="plan-actions"></div>
+      </div>
+      <div class="funds" id="funds-panel">
+        <div class="lab">Where are your funds</div>
+        <div class="where" id="funds-where">Your wallet</div>
+        <p id="funds-detail"></p>
+      </div>
+      <div id="deposit-box"></div>
+      <div class="kpis" id="plan-kpis"></div>
+      <div class="card" style="margin-top:20px">
+        <h2>History</h2>
+        <div class="tablewrap">
+          <table>
+            <thead><tr><th>When</th><th>Status</th><th>In</th><th>Out</th><th>Fees / slippage</th><th>Links</th></tr></thead>
+            <tbody id="hist-body"><tr><td class="empty" colspan="6">No buys yet.</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+      <p class="err" id="plan-err"></p>
+    </div>
+  </main>
+</div>
+
+<footer>
+  <div class="wrap">
+    <div>
+      <div>Built at <b>NEAR HACKATHON</b> for the Unstoppable DeFi track.</div>
+      <div>Independent project, not affiliated with NEAR Foundation. NEAR and the NEAR logo are trademarks of NEAR Foundation.</div>
+    </div>
+    <div>
+      <a href="https://github.com/naimuli74/near-dca-vault">Source</a> ·
+      <a href="https://github.com/naimuli74/near-payments-rail-thesis">Other hackathon project</a> ·
+      <a href="https://docs.near-intents.org/integration/distribution-channels/1click-api/quickstart/making-a-request">1Click docs</a>
+    </div>
+  </div>
+</footer>
+<script src="/app.js"></script>
+</body>
+</html>

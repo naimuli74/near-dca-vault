@@ -15,6 +15,14 @@
     return '';
   };
 
+  const CHAIN_NAMES = {
+    eth: 'Ethereum', base: 'Base', arb: 'Arbitrum', sol: 'Solana', near: 'NEAR',
+    op: 'Optimism', pol: 'Polygon', avax: 'Avalanche', gnosis: 'Gnosis', bsc: 'BNB Chain',
+    aptos: 'Aptos', sui: 'Sui', stellar: 'Stellar', monad: 'Monad', xlayer: 'X Layer',
+    hypercore: 'Hypercore',
+  };
+  const chainName = (id) => CHAIN_NAMES[id] || String(id || '').toUpperCase();
+
   function setTheme(t) {
     document.documentElement.dataset.theme = t;
     const m = $('themecolor');
@@ -113,16 +121,94 @@
     tokens = data;
     const sel = $('origin');
     if (!sel) return;
-    sel.innerHTML = data.usdc.map(t => `<option value="${esc(t.assetId)}">${esc(t.symbol)} on ${esc(t.blockchain)}</option>`).join('');
+    sel.innerHTML = data.usdc.map(t => `<option value="${esc(t.assetId)}">${esc(t.symbol)} on ${esc(chainName(t.blockchain))}</option>`).join('');
     const eth = data.usdc.find(t => t.blockchain === 'eth');
     if (eth) sel.value = eth.assetId;
     updateHints();
+    renderChainStrip(data.usdc || []);
+    startRouteCycle(data.usdc || []);
+    loadTicker();
+  }
+
+  function renderChainStrip(usdc) {
+    const el = $('chain-strip');
+    if (!el) return;
+    el.innerHTML = usdc.map(t => {
+      const href = '#create';
+      return `<a class="chip" href="${href}" data-chain="${esc(t.blockchain)}"><i></i>${esc(chainName(t.blockchain))}</a>`;
+    }).join('');
+    el.querySelectorAll('[data-chain]').forEach((a) => {
+      a.addEventListener('click', (ev) => {
+        ev.preventDefault();
+        const tok = tokens.usdc.find(t => t.blockchain === a.dataset.chain);
+        if (tok && $('origin')) {
+          $('origin').value = tok.assetId;
+          updateHints();
+        }
+        document.getElementById('create')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    });
+  }
+
+  let routeTimer = null;
+  function startRouteCycle(usdc) {
+    const el = $('route-chain');
+    if (!el || !usdc.length) return;
+    const names = usdc.map(t => chainName(t.blockchain));
+    let i = Math.max(0, names.indexOf('Ethereum'));
+    el.textContent = 'on ' + names[i];
+    if (routeTimer) clearInterval(routeTimer);
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    routeTimer = setInterval(() => {
+      i = (i + 1) % names.length;
+      el.textContent = 'on ' + names[i];
+    }, 2200);
+  }
+
+  async function loadTicker() {
+    const body = $('ticker-body');
+    const meta = $('ticker-meta');
+    const lab = $('ticker-label');
+    const dot = $('ticker-dot');
+    if (!body) return;
+    try {
+      const data = await api('/api/ticker');
+      if (lab) lab.textContent = 'Live 1Click dry quotes';
+      if (meta) {
+        const when = data.fetchedAt ? new Date(data.fetchedAt).toLocaleTimeString() : '';
+        meta.textContent = `${data.amountHuman || 50} ${data.originSymbol || 'USDC'} on ${chainName(data.originChain || 'eth')}${when ? ' · ' + when : ''}`;
+      }
+      if (dot) dot.classList.remove('err');
+      body.innerHTML = (data.quotes || []).map((q) => {
+        if (q.error) {
+          return `<div class="tick"><div class="t-k">${esc(q.target)}</div><div class="t-err">${esc(q.error)}</div></div>`;
+        }
+        const out = (q.destSymbol || q.target || '').toUpperCase() === 'BTC' && q.amountOut
+          ? Math.round(q.amountOut * 1e8).toLocaleString('en-US') + ' sats'
+          : `${fmtAmt(q.amountOut, 6)} ${esc(q.destSymbol || q.target)}`;
+        const fee = q.feeUsd != null ? `Fees ${fmtUsd(q.feeUsd)}` : '';
+        const slip = q.priceSlippageBps != null ? `${fmtAmt(q.priceSlippageBps, 0)} bps after fees` : '';
+        return `<div class="tick">
+          <div class="t-k">${esc(q.target)} · ${fmtUsd(q.amountInUsd)} in</div>
+          <div class="t-v">${out}</div>
+          <div class="t-d">${[fmtUsd(q.amountOutUsd), fee, slip].filter(Boolean).join(' · ')}</div>
+        </div>`;
+      }).join('');
+    } catch (e) {
+      if (dot) dot.classList.add('err');
+      if (lab) lab.textContent = 'Quotes unavailable';
+      if (meta) meta.textContent = e.message;
+      body.innerHTML = `<div class="tick"><div class="t-err">${esc(e.message)}</div></div>`;
+    }
   }
 
   $('preview')?.addEventListener('click', async () => {
     const err = $('form-err');
     err.textContent = '';
     $('preview').disabled = true;
+    if ($('preview-empty')) $('preview-empty').hidden = true;
+    if ($('preview-body')) $('preview-body').hidden = true;
+    if ($('preview-skel')) $('preview-skel').hidden = false;
     try {
       const b = formBody();
       const origin = tokens.usdc.find(t => t.assetId === b.originAsset);
@@ -143,10 +229,13 @@
           slippageTolerance: b.slippageBps,
         }),
       });
+      if ($('preview-skel')) $('preview-skel').hidden = true;
       $('preview-empty').hidden = true;
       $('preview-body').hidden = false;
       $('preview-body').innerHTML = renderFeeBox(data.analysis, data.quote);
     } catch (e) {
+      if ($('preview-skel')) $('preview-skel').hidden = true;
+      if ($('preview-empty')) $('preview-empty').hidden = false;
       err.textContent = e.message;
     } finally {
       $('preview').disabled = false;
@@ -281,7 +370,7 @@
 
   function renderHistory(rows) {
     const tb = $('hist-body');
-    if (!rows.length) { tb.innerHTML = '<tr><td class="empty" colspan="6">No buys yet. Run a dry buy to fetch a real 1Click quote.</td></tr>'; return; }
+    if (!rows.length) { tb.innerHTML = '<tr><td class="empty" colspan="6"><div class="empty-state tight"><div class="empty-ico" aria-hidden="true">◎</div><p>No buys yet. Run a dry buy to fetch a real 1Click quote.</p></div></td></tr>'; return; }
     tb.innerHTML = rows.map(r => {
       const a = r.analysis || {};
       const links = (r.explorers || []).map(l => `<a href="${esc(l.url)}" rel="noopener" target="_blank">${esc(l.label)}</a>`).join(' · ');
@@ -321,6 +410,58 @@
       pollTimer = setInterval(() => showPlan(p.id), 8000);
     }
   }
+
+  function sparkSvg(vals) {
+    if (!vals || vals.length < 2) return '';
+    const w = 640, h = 72, p = 4;
+    const min = Math.min(...vals), max = Math.max(...vals);
+    const span = max - min || 1;
+    const pts = vals.map((v, i) => {
+      const x = p + (i / (vals.length - 1)) * (w - p * 2);
+      const y = h - p - ((v - min) / span) * (h - p * 2);
+      return `${x.toFixed(1)},${y.toFixed(1)}`;
+    }).join(' ');
+    return `<svg class="sim-chart" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" aria-hidden="true"><polyline fill="none" stroke="currentColor" stroke-width="2.2" points="${pts}" style="color:var(--near-d)"/></svg>`;
+  }
+
+  $('sim-form')?.addEventListener('submit', async (ev) => {
+    ev.preventDefault();
+    const err = $('sim-err');
+    const out = $('sim-results');
+    const skel = $('sim-skel');
+    err.textContent = '';
+    if (out) out.hidden = true;
+    if (skel) skel.hidden = false;
+    const btn = $('sim-run');
+    if (btn) btn.disabled = true;
+    try {
+      const q = new URLSearchParams({
+        asset: $('sim-asset').value,
+        amount: $('sim-amount').value.trim(),
+        weeks: $('sim-weeks').value,
+      });
+      const data = await api('/api/simulate?' + q.toString());
+      if (skel) skel.hidden = true;
+      if (!out) return;
+      const sign = (n) => (n >= 0 ? '+' : '−') + fmtUsd(Math.abs(n)).replace('$', '');
+      const vsCls = data.vsSpent >= 0 ? 'okmsg' : 'err';
+      out.hidden = false;
+      out.innerHTML = `
+        <div class="sim-kpis">
+          <div class="kpi"><div class="k">Spent</div><div class="v">${fmtUsd(data.spent)}</div><div class="d">${data.weeksUsed} weekly buys of ${fmtUsd(data.amount)}</div></div>
+          <div class="kpi"><div class="k">Bought</div><div class="v">${fmtAmt(data.coins, 6)}</div><div class="d">${esc(data.asset)} · avg ${fmtUsd(data.avgPrice)}</div></div>
+          <div class="kpi"><div class="k">Value now</div><div class="v">${fmtUsd(data.valueNow)}</div><div class="d ${vsCls}">${sign(data.vsSpent)} vs spent</div></div>
+          <div class="kpi"><div class="k">Vs lump sum</div><div class="v">${sign(data.vsLump)}</div><div class="d">Lump at first price would be ${fmtUsd(data.lumpValue)}</div></div>
+        </div>
+        ${sparkSvg(data.spark)}
+        <p class="sim-note">${esc(data.note)} ${data.firstBuyAt && data.lastPriceAt ? `Window: ${esc(data.firstBuyAt)} to ${esc(data.lastPriceAt)}. ` : ''}Source: <a href="${esc(data.sourceUrl)}" rel="noopener">CoinGecko</a>.</p>`;
+    } catch (e) {
+      if (skel) skel.hidden = true;
+      err.textContent = e.message;
+    } finally {
+      if (btn) btn.disabled = false;
+    }
+  });
 
   window.addEventListener('hashchange', route);
   loadTokens().then(route).catch((e) => {

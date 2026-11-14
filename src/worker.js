@@ -1,6 +1,7 @@
 import { fetchTokens, getQuote, getStatus, submitDeposit, analyzeQuote, explorerLinks, usdcOptions, TARGETS, findToken } from './oneclick.js';
 import { putPlan, getPlan, listPlans, getHistory, appendHistory, cachedTokens } from './store.js';
 import { createPlan, isDue, advancePlan, planOpen, fundsLocation, newId, INTERVALS } from './plans.js';
+import { getTicker, simulateDca } from './market.js';
 
 const JSON_HEADERS = {
   'content-type': 'application/json; charset=utf-8',
@@ -234,6 +235,20 @@ async function handleApi(req, env) {
       funds: fundsLocation(status.status, null),
       explorers: explorerLinks(status, depositAddress),
     });
+  }
+
+  if (method === 'GET' && path === '/api/ticker') {
+    const list = await tokens(env);
+    const data = await getTicker(env, list);
+    return json(data);
+  }
+
+  if (method === 'GET' && path === '/api/simulate') {
+    const asset = u.searchParams.get('asset') || 'BTC';
+    const amount = u.searchParams.get('amount') || '50';
+    const weeks = u.searchParams.get('weeks') || '52';
+    const data = await simulateDca(env, { asset, amount, weeks });
+    return json(data);
   }
 
   if (method === 'POST' && path === '/api/deposit/submit') {

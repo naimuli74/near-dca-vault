@@ -11,7 +11,7 @@ Dry-run is the default and the path for judges: it uses real unauthenticated 1Cl
 
 ## Try it (do X, see Y)
 
-1. Open https://dca.darkhouse.online. You see a dry-run plan form, a dark/light toggle, and a short explanation of the flow.
+1. Open https://dca.darkhouse.online. You see a hero route (USDC → NEAR Intents → your address), a live 1Click dry-quote ticker, the supported USDC chains, a dry-run plan form, and a dark/light toggle.
 2. Leave **Dry-run** selected. Pick USDC on Ethereum, BTC, 50 USDC, a daily (or 5-minute) interval, a Bitcoin destination address and an Ethereum refund address. You can use the BIP-173 example `bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4` and any well-formed 0x refund address; nothing will be sent.
 3. Press **Preview quote**. You see a real 1Click dry quote: amounts, withdraw and refund fees, the 1Click fee, and whether the quote passes your slippage limit.
 4. Press **Create plan**, then **Run next buy (dry)**. You see a history row with status `DRY QUOTED` (or `SKIPPED SLIPPAGE`) and a "Where are your funds" panel that says nothing moved.
@@ -32,6 +32,8 @@ Live mode is opt-in and mainnet-only (there is no Intents testnet; see HACKATHON
 ```
 Browser  →  Cloudflare Worker (dca.darkhouse.online)
                 ├─ GET  /api/tokens          cached 1Click token list
+                ├─ GET  /api/ticker          cached 1Click dry quotes (50 USDC → BTC/ETH/NEAR)
+                ├─ GET  /api/simulate        CoinGecko weekly DCA backtest
                 ├─ POST /api/quote           always dry
                 ├─ POST /api/plans           create a plan (KV)
                 ├─ GET  /api/plans/:id       plan + history + funds panel
@@ -74,6 +76,7 @@ src/worker.js          Worker routes and cron
 src/oneclick.js        1Click client, fee display, slippage gate
 src/plans.js           Plan validation and funds-location copy
 src/store.js           KV helpers
+src/market.js          1Click ticker and CoinGecko simulator
 public/                Static UI (dark and light)
 scripts/build.mjs      Bundles the Worker
 scripts/dry_quote.sh   Unauthenticated dry quote
@@ -85,6 +88,22 @@ bash scripts/dry_quote.sh
 ```
 
 The Worker is deployed to account `924b192f1ecca16e26617be53011939d` as `near-dca-vault`, with KV and a cron trigger, on `dca.darkhouse.online`.
+
+
+## Site additions
+
+The plan form, dry-run default, live opt-in, funds panel and history are unchanged. The home page also has:
+
+- A live **ticker** of unauthenticated 1Click dry quotes for 50 USDC on Ethereum into BTC, ETH and NEAR. Quotes are cached for about 90 seconds and use public example addresses. Nothing is deposited.
+- A **supported-chains** strip from `GET /v0/tokens` (the same list as the origin menu).
+- A **fee explainer** that cites the official 0.25% unauthenticated 1Click platform fee, withdraw/refund fees, and the slippage gate.
+- A **historical DCA simulator**: “if you had bought $X of BTC, ETH or NEAR every week for N weeks.” Prices come from [CoinGecko](https://www.coingecko.com) daily USD charts, sampled weekly, and are cached for about six hours. If CoinGecko rate-limits the Worker, the simulator falls back to Coinbase Exchange public daily closes and names that source in the result. The result is labelled as a price-path simulation, not a 1Click quote, and it does not include swap fees.
+- An **FAQ**, including whether the app is custodial and what happens if a swap fails.
+- Footer links to the [GitHub repo](https://github.com/naimuli74/near-dca-vault), the [demo post](https://x.com/naimulislam/status/2121695044352839829), and the sister project at https://near.darkhouse.online.
+
+## Rollback
+
+The last pre-polish production tree is git commit `5bc7d49`. To roll the Worker and site back to that version, check out that commit, run `KV_NAMESPACE_ID=6dc2c69028764710a20fb03bdf90e7c7 npm run build`, and redeploy `dist/deploy.js` the same way as a normal release.
 
 ## License
 

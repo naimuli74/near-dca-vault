@@ -22,6 +22,7 @@ const modules = [
   strip(read('src/oneclick.js')),
   strip(read('src/store.js')),
   strip(read('src/plans.js')),
+  strip(read('src/market.js')),
   strip(read('src/worker.js')),
 ].join('\n');
 

@@ -12,11 +12,14 @@
 <meta property="og:title" content="Cross-chain DCA, without a custodian">
 <meta property="og:description" content="A NEAR HACKATHON Unstoppable DeFi entry. Real 1Click quotes, dry-run by default, live buys you fund yourself.">
 <meta property="og:image" content="https://dca.darkhouse.online/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:creator" content="@naimulislam">
 <meta name="twitter:title" content="Cross-chain DCA, without a custodian">
 <meta name="twitter:description" content="A NEAR HACKATHON Unstoppable DeFi entry. Real 1Click quotes, dry-run by default.">
 <meta name="twitter:image" content="https://dca.darkhouse.online/og.png">
+<meta name="twitter:image:alt" content="DCA Vault: USDC on any Intents chain, through NEAR Intents, to BTC, ETH or NEAR at your address.">
 <meta name="theme-color" content="#f3f0e8" id="themecolor">
 <meta name="color-scheme" content="light dark">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
@@ -39,6 +42,12 @@ d.dataset.theme=t;var m=document.querySelector("#themecolor");if(m)m.content=t==
       <svg class="mark" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#00ec97"/><path d="M8 23V10l10 12V9M16 13l4-4 4 4" stroke="#05140d" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
       <span class="name"><b>DCA Vault</b><span>NEAR Intents</span></span>
     </a>
+    <nav class="hdr-nav" aria-label="Sections">
+      <a href="#how">How it works</a>
+      <a href="#create">Start a plan</a>
+      <a href="#simulate">Simulator</a>
+      <a href="#faq">FAQ</a>
+    </nav>
     <div class="hdr-r">
       <button class="themetog" type="button" id="themetog" aria-label="Toggle dark mode">
         <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 14.5A8.5 8.5 0 1 1 9.5 3 7 7 0 0 0 21 14.5z" stroke-linejoin="round"/></svg>
@@ -52,31 +61,101 @@ d.dataset.theme=t;var m=document.querySelector("#themecolor");if(m)m.content=t==
 <div id="home-view">
 <section class="hero">
   <div class="mesh" aria-hidden="true"><i></i><i></i></div>
-  <div class="wrap">
-    <div class="eyebrow"><i></i>NEAR HACKATHON · Unstoppable DeFi</div>
-    <h1>Cross-chain DCA, <span class="g">without a custodian.</span></h1>
-    <p class="lede">Deposit USDC from any chain NEAR Intents supports, pick BTC, ETH or NEAR, and a schedule. Each buy is a real 1Click quote. Dry-run is the default: judges can try it with no funds. Live mode is opt-in, and you send each interval yourself to a fresh deposit address.</p>
-    <div class="hero-cta">
-      <a class="btn pri" href="#create">Start a dry-run <span class="arr" aria-hidden="true">→</span></a>
-      <a class="btn" href="#how">How it works</a>
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
+      <div class="eyebrow"><i></i>NEAR HACKATHON · Unstoppable DeFi</div>
+      <h1>Cross-chain DCA, <span class="g">without a custodian.</span></h1>
+      <p class="lede">Deposit USDC from any chain NEAR Intents supports, pick BTC, ETH or NEAR, and a schedule. Each buy is a real 1Click quote. Dry-run is the default: judges can try it with no funds. Live mode is opt-in, and you send each interval yourself to a fresh deposit address.</p>
+      <div class="hero-cta">
+        <a class="btn pri" href="#create">Start a dry-run <span class="arr" aria-hidden="true">→</span></a>
+        <a class="btn" href="#how">How it works</a>
+      </div>
+      <ul class="hero-facts">
+        <li>Real 1Click quotes</li>
+        <li>Dry-run by default</li>
+        <li>No custody, no keys</li>
+      </ul>
     </div>
-    <ul class="hero-facts">
-      <li>Real 1Click quotes</li>
-      <li>Dry-run by default</li>
-      <li>No custody, no keys</li>
-    </ul>
+    <div class="route" aria-hidden="true">
+      <div class="route-card">
+        <div class="route-row">
+          <div class="route-node">
+            <div class="route-ico usdc">$</div>
+            <div class="route-lab">USDC</div>
+            <div class="route-sub" id="route-chain">on Ethereum</div>
+          </div>
+          <span class="route-line"><i></i></span>
+          <div class="route-node intents">
+            <div class="route-ico near">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19V6l8 11V5m3 4 3-3 3 3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="route-lab">NEAR Intents</div>
+            <div class="route-sub">1Click quote</div>
+          </div>
+          <span class="route-line"><i></i></span>
+          <div class="route-node dest">
+            <div class="route-coins">
+              <span>BTC</span><span>ETH</span><span>NEAR</span>
+            </div>
+            <div class="route-lab">Your address</div>
+            <div class="route-sub">on the destination chain</div>
+          </div>
+        </div>
+        <p class="route-caption">You keep the funds. The app never holds a key or a balance.</p>
+      </div>
+    </div>
   </div>
 </section>
 
+<div class="ticker-wrap" id="ticker">
+  <div class="wrap">
+    <div class="ticker-head">
+      <span class="live-dot" id="ticker-dot"></span>
+      <span id="ticker-label">Live 1Click dry quotes</span>
+      <span class="ticker-meta" id="ticker-meta">50 USDC on Ethereum</span>
+    </div>
+    <div class="ticker" id="ticker-body">
+      <div class="skel skel-ticker"></div>
+      <div class="skel skel-ticker"></div>
+      <div class="skel skel-ticker"></div>
+    </div>
+  </div>
+</div>
+
 <main id="main">
   <div class="wrap">
-    <div class="steps" id="how">
-      <div class="step"><div class="sn">1</div><h3>Create a plan</h3><p>Choose USDC on a supported chain, a target asset, a destination address, a size, a slippage limit and a schedule.</p></div>
-      <div class="step"><div class="sn">2</div><h3>Get a real quote</h3><p>Each interval asks 1Click for a quote. Dry-run stops there. If the price is worse than your limit after fees, the buy is skipped.</p></div>
-      <div class="step"><div class="sn">3</div><h3>You send, if you want</h3><p>In live mode you fund that interval's deposit address yourself. The asset lands in your own address. We never hold the funds.</p></div>
-    </div>
+    <section class="chains" id="chains" aria-label="Supported USDC origin chains">
+      <h2>USDC can come from</h2>
+      <p class="sec-lead">Every chain below is on the current 1Click token list. The origin menu uses the same list.</p>
+      <div class="chain-strip" id="chain-strip">
+        <span class="skel skel-chip"></span><span class="skel skel-chip"></span><span class="skel skel-chip"></span>
+        <span class="skel skel-chip"></span><span class="skel skel-chip"></span><span class="skel skel-chip"></span>
+      </div>
+    </section>
 
-    <div class="grid" id="create" style="margin-top:28px">
+    <section class="how" id="how">
+      <h2>How it works</h2>
+      <p class="sec-lead">Three steps. Dry-run stops after the quote. Live mode is something you opt into, per interval.</p>
+      <div class="steps">
+        <div class="step">
+          <div class="sn">1</div>
+          <h3>Create a plan</h3>
+          <p>Choose USDC on a supported chain, a target asset, a destination address, a size, a slippage limit and a schedule.</p>
+        </div>
+        <div class="step">
+          <div class="sn">2</div>
+          <h3>Get a real quote</h3>
+          <p>Each interval asks 1Click for a quote. Dry-run stops there. If the price is worse than your limit after fees, the buy is skipped.</p>
+        </div>
+        <div class="step">
+          <div class="sn">3</div>
+          <h3>You send, if you want</h3>
+          <p>In live mode you fund that interval's deposit address yourself. The asset lands in your own address. We never hold the funds.</p>
+        </div>
+      </div>
+    </section>
+
+    <div class="grid" id="create">
       <div class="card">
         <h2>New plan</h2>
         <form class="form" id="plan-form">
@@ -88,7 +167,7 @@ d.dataset.theme=t;var m=document.querySelector("#themecolor");if(m)m.content=t==
             <div class="hint" id="mode-hint">Dry-run fetches real quotes and writes them to history. Nothing is deposited.</div>
           </div>
           <label>USDC from
-            <select id="origin" required></select>
+            <select id="origin" required><option value="">Loading chains…</option></select>
           </label>
           <label>Buy
             <select id="target" required>
@@ -140,7 +219,15 @@ d.dataset.theme=t;var m=document.querySelector("#themecolor");if(m)m.content=t==
       <div>
         <div class="card" id="preview-card">
           <h2>Quote preview</h2>
-          <p class="muted" id="preview-empty">Press Preview quote for a live dry quote from the 1Click API. No deposit address is created.</p>
+          <div id="preview-empty" class="empty-state">
+            <div class="empty-ico" aria-hidden="true">◎</div>
+            <p>Press Preview quote for a live dry quote from the 1Click API. No deposit address is created.</p>
+          </div>
+          <div id="preview-skel" class="skel-stack" hidden>
+            <div class="skel skel-line"></div>
+            <div class="skel skel-line"></div>
+            <div class="skel skel-line short"></div>
+          </div>
           <div id="preview-body" hidden></div>
         </div>
         <div class="callout">
@@ -148,6 +235,87 @@ d.dataset.theme=t;var m=document.querySelector("#themecolor");if(m)m.content=t==
         </div>
       </div>
     </div>
+
+    <section class="band" id="fees">
+      <h2>What the fees are</h2>
+      <p class="sec-lead">Every number in a preview comes from a real 1Click dry quote. This is the official fee schedule, not an estimate we invented.</p>
+      <div class="fee-grid">
+        <div class="card lift">
+          <h3>1Click platform fee</h3>
+          <p>Unauthenticated quotes include an extra <b>0.25%</b> platform fee. A partner JWT is optional and is not in this build. <a href="https://docs.near-intents.org/resources/fees" rel="noopener">Fee docs</a>.</p>
+        </div>
+        <div class="card lift">
+          <h3>Withdraw and refund fees</h3>
+          <p>Destination withdraw fees are often fixed, so a small buy can look expensive. If a swap fails, a refund fee may apply. Both are shown on each quote.</p>
+        </div>
+        <div class="card lift">
+          <h3>Your slippage gate</h3>
+          <p>If the quoted price, after those known fees, is worse than your limit, that interval is skipped. Nothing is deposited, in dry-run or live mode.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="band" id="simulate">
+      <h2>If you had DCA'd</h2>
+      <p class="sec-lead">A historical simulator using daily USD prices from <a href="https://www.coingecko.com" rel="noopener">CoinGecko</a>, sampled once a week. It is not a 1Click quote and it does not include swap fees or slippage.</p>
+      <div class="card sim-card">
+        <form class="sim-form" id="sim-form">
+          <label>Amount each week (USD)
+            <input id="sim-amount" inputmode="decimal" value="50" required>
+          </label>
+          <label>Asset
+            <select id="sim-asset">
+              <option value="BTC">Bitcoin (BTC)</option>
+              <option value="ETH">Ether (ETH)</option>
+              <option value="NEAR">NEAR</option>
+            </select>
+          </label>
+          <label>Weeks
+            <select id="sim-weeks">
+              <option value="12">12 weeks</option>
+              <option value="26">26 weeks</option>
+              <option value="52" selected>52 weeks</option>
+            </select>
+          </label>
+          <div class="sim-go">
+            <button class="btn pri" type="submit" id="sim-run">Run simulation</button>
+          </div>
+        </form>
+        <p class="err" id="sim-err"></p>
+        <div id="sim-skel" class="skel-stack" hidden>
+          <div class="skel skel-line"></div>
+          <div class="skel skel-line"></div>
+          <div class="skel skel-line short"></div>
+        </div>
+        <div id="sim-results" hidden></div>
+      </div>
+    </section>
+
+    <section class="band" id="faq">
+      <h2>FAQ</h2>
+      <div class="faq">
+        <details open>
+          <summary>Is it custodial?</summary>
+          <p>No. This app never holds your funds or your keys. Dry-run does not issue a deposit address. In live mode you send each interval yourself to a fresh 1Click address, and the bought asset is delivered to an address you control.</p>
+        </details>
+        <details>
+          <summary>What if a swap fails?</summary>
+          <p>1Click can refund to the refund address you set. History shows <code>FAILED</code> or <code>REFUNDED</code>, with explorer links when 1Click provides them. The app cannot move funds. Check the refund address and the <a href="https://explorer.near-intents.org" rel="noopener">NEAR Intents explorer</a>.</p>
+        </details>
+        <details>
+          <summary>Why is dry-run the default?</summary>
+          <p>There is no Intents testnet. Dry-run still asks 1Click for a real quote with <code>dry: true</code>, so you can see fees and the slippage gate without sending funds. Live mode is opt-in and mainnet-only.</p>
+        </details>
+        <details>
+          <summary>Why isn't there a standing vault?</summary>
+          <p>1Click deposit addresses are unique and expire in about 10 minutes, so a recurring vault cannot sit on one address. A later version could use a NEAR contract and Chain Signatures. That is not in this build.</p>
+        </details>
+        <details>
+          <summary>Are the quotes on this page real?</summary>
+          <p>Yes. The ticker, the preview, and dry-run history all come from unauthenticated 1Click dry quotes. The simulator is different: it uses CoinGecko historical USD prices only, and says so next to the result.</p>
+        </details>
+      </div>
+    </section>
   </div>
 </main>
 </div>
@@ -175,7 +343,12 @@ d.dataset.theme=t;var m=document.querySelector("#themecolor");if(m)m.content=t==
         <div class="tablewrap">
           <table>
             <thead><tr><th>When</th><th>Status</th><th>In</th><th>Out</th><th>Fees / slippage</th><th>Links</th></tr></thead>
-            <tbody id="hist-body"><tr><td class="empty" colspan="6">No buys yet.</td></tr></tbody>
+            <tbody id="hist-body"><tr><td class="empty" colspan="6">
+              <div class="empty-state tight">
+                <div class="empty-ico" aria-hidden="true">◎</div>
+                <p>No buys yet. Run a dry buy to fetch a real 1Click quote.</p>
+              </div>
+            </td></tr></tbody>
           </table>
         </div>
       </div>
@@ -190,10 +363,11 @@ d.dataset.theme=t;var m=document.querySelector("#themecolor");if(m)m.content=t==
       <div>Built at <b>NEAR HACKATHON</b> for the Unstoppable DeFi track.</div>
       <div>Independent project, not affiliated with NEAR Foundation. NEAR and the NEAR logo are trademarks of NEAR Foundation.</div>
     </div>
-    <div>
-      <a href="https://github.com/naimuli74/near-dca-vault">Source</a> ·
-      <a href="https://github.com/naimuli74/near-payments-rail-thesis">Other hackathon project</a> ·
-      <a href="https://docs.near-intents.org/integration/distribution-channels/1click-api/quickstart/making-a-request">1Click docs</a>
+    <div class="foot-links">
+      <a href="https://github.com/naimuli74/near-dca-vault" rel="noopener">GitHub</a>
+      <a href="https://x.com/naimulislam/status/2121695044352839829" rel="noopener">Demo post</a>
+      <a href="https://near.darkhouse.online" rel="noopener">Sister project</a>
+      <a href="https://docs.near-intents.org/integration/distribution-channels/1click-api/quickstart/making-a-request" rel="noopener">1Click docs</a>
     </div>
   </div>
 </footer>

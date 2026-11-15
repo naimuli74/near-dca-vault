@@ -307,6 +307,7 @@ async function serveStatic(pathname, env) {
     'x-content-type-options': 'nosniff',
     'referrer-policy': 'strict-origin-when-cross-origin',
     'cache-control': asset.immutable ? 'public, max-age=86400' : 'public, max-age=60',
+    'access-control-allow-origin': '*',
   };
   return new Response(asset.body, { headers });
 }
